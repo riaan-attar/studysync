@@ -50,9 +50,8 @@ export default function LandingPage({ setCurrentView }: LandingPageProps) {
           <Image
             src="/landing3.png"
             alt="Doodle-style illustrations for Study Scan"
-            layout="fill"
-            objectFit="contain"
-            objectPosition="center"
+            fill
+            style={{ objectFit: "contain", objectPosition: "center" }}
             className="opacity-95"
             priority
           />
