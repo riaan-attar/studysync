@@ -27,9 +27,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Study Scan API", lifespan=lifespan)
 
 origins = [
-    "https://campus-companion-six.vercel.app",
+    "https://studysync-tau-rust.vercel.app",
     "http://localhost:3000",
-    
     "http://127.0.0.1:3000",
 ]
 app.add_middleware(
