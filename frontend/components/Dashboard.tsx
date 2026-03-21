@@ -6,12 +6,31 @@ import Sidebar from "./Sidebar"
 import ChatSection from "./ChatSection"
 import AdvisorView from "./AdvisorView"
 import UpdatesView from "./UpdatesView"
+import ProfileView from './ProfileView';
+import { useAuth } from '../context/AuthContext';
 import React, { useState } from "react"
 import LandingPage from "./LandingPage"
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [currentView, setCurrentView] = useState("home")
+
+  const renderContent = () => {
+    switch (currentView) {
+      case 'home':
+        return <LandingPage setCurrentView={setCurrentView} />;
+      case 'chat':
+        return <ChatSection />;
+      case 'updates':
+        return <UpdatesView />;
+      case 'advisor':
+        return <AdvisorView />;
+      case 'profile':
+        return <ProfileView />;
+      default:
+        return <LandingPage setCurrentView={setCurrentView} />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-foreground flex relative">
@@ -40,12 +59,7 @@ export default function Dashboard() {
 
       {/* Main content */}
       <main className="flex flex-1 flex-col transition-all duration-300 md:pl-64 relative z-10">
-        {currentView === "home" && (
-          <LandingPage setCurrentView={setCurrentView} />
-        )}
-        {currentView === "chat" && <ChatSection />}
-        {currentView === "updates" && <UpdatesView />}
-        {currentView === "advisor" && <AdvisorView />}
+        {renderContent()}
       </main>
     </div>
   )

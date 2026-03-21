@@ -3,7 +3,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { MessageSquare, Mail, Zap, Home as HomeIcon, LogOut, LogIn } from "lucide-react"
+import { HomeIcon, MessageSquare, Mail, Zap, LogOut, Loader2, User, LogIn } from "lucide-react"
 import React from "react"
 import { useAuth } from "@/context/AuthContext"
 import { signOut } from "next-auth/react"
@@ -52,10 +52,19 @@ export default function Sidebar({
 }: SidebarProps) {
   const { session, status, requestProtectedAccess } = useAuth()
 
+  const navItems = [
+    { id: 'home', label: 'Home', icon: HomeIcon, protected: false },
+    { id: 'chat', label: 'Agent Chat', icon: MessageSquare, protected: true },
+    { id: 'updates', label: 'Mail Updates', icon: Mail, protected: true },
+    { id: 'advisor', label: 'Advisor Agent', icon: Zap, protected: true },
+    { id: 'profile', label: 'Profile', icon: User, protected: true },
+  ];
+
   const handleNavigation = (view: string) => {
+    const item = navItems.find(item => item.id === view);
     let accessGranted = true;
 
-    if (view !== 'home') {
+    if (item?.protected) {
       accessGranted = requestProtectedAccess();
     }
 
@@ -86,31 +95,31 @@ export default function Sidebar({
 
       {/* Navigation */}
       <nav className="flex flex-col space-y-1 mt-1">
-        <NavButton isActive={currentView === "home"} onClick={() => handleNavigation("home")}>
-          <HomeIcon className="mr-3 h-4 w-4" />
-          Home
-        </NavButton>
-        <NavButton isActive={currentView === "chat"} onClick={() => handleNavigation("chat")}>
-          <MessageSquare className="mr-3 h-4 w-4" />
-          Agent Chat
-        </NavButton>
-        <NavButton isActive={currentView === "updates"} onClick={() => handleNavigation("updates")}>
-          <Mail className="mr-3 h-4 w-4" />
-          Mail Updates
-        </NavButton>
-        <NavButton isActive={currentView === "advisor"} onClick={() => handleNavigation("advisor")}>
-          <Zap className="mr-3 h-4 w-4" />
-          Advisor Agent
-        </NavButton>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavButton
+              key={item.id}
+              isActive={currentView === item.id}
+              onClick={() => handleNavigation(item.id)}
+            >
+              <Icon className="mr-3 h-4 w-4" />
+              {item.label}
+            </NavButton>
+          );
+        })}
       </nav>
 
       {/* User section */}
-      <div className="mt-auto pt-4 border-t border-white/[0.06]">
+      <div className="absolute bottom-0 w-full p-4 border-t border-white/[0.08] bg-black/20 backdrop-blur-md">
         {status === 'authenticated' && session?.user ? (
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[rgba(77,252,224,0.1)] flex items-center justify-center shrink-0">
-                <span className="text-xs font-semibold text-[#4dfce0]">
+          <div className="flex items-center justify-between px-2">
+            <div
+              className="flex items-center space-x-3 cursor-pointer group"
+              onClick={() => handleNavigation('profile')}
+            >
+              <div className="w-8 h-8 rounded-full bg-[#4dfce0]/20 flex items-center justify-center border border-[#4dfce0]/30 group-hover:bg-[#4dfce0]/30 transition-colors">
+                <span className="text-sm font-semibold text-[#4dfce0]">
                   {(session.user?.name || session.user?.email || '?').charAt(0).toUpperCase()}
                 </span>
               </div>

@@ -11,6 +11,13 @@ class User(Base):
     name = Column(String, nullable=True)
     google_refresh_token = Column(String, nullable=True)
     
+    # User Profile Fields
+    phone_number = Column(String, nullable=True)
+    profile_image = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
+    date_of_birth = Column(String, nullable=True)
+    
     # Relationship to updates
     updates = relationship("ImportantUpdate", back_populates="user")
 

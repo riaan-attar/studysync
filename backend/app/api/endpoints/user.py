@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError # <-- Import this
 from app import models
-from app.schemas.user import UserResponse, UserCreate, StoreTokenRequest
+from app.schemas.user import UserResponse, UserCreate, StoreTokenRequest, UserProfileUpdate
 from app.database import SessionLocal
 from app.core.security import get_current_user, VerifiedUser
 
@@ -40,6 +40,28 @@ async def read_users_me(
                 raise HTTPException(status_code=500, detail="Failed to get or create user.")
         
     return db_user
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
+    profile_data: UserProfileUpdate,
+    user: VerifiedUser = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    update_data = profile_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+        
+    try:
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating profile: {str(e)}")
 
 @router.post("/users/store_refresh_token", status_code=200)
 async def store_refresh_token(

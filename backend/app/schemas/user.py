@@ -8,11 +8,26 @@ class UserCreate(BaseModel):
     email: EmailStr
     name: str | None = None
 
+class UserProfileUpdate(BaseModel):
+    name: str | None = None
+    phone_number: str | None = None
+    profile_image: str | None = None
+    address: str | None = None
+    bio: str | None = None
+    date_of_birth: str | None = None
+
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
     name: str | None = None
     google_refresh_token: str | None = None
+    
+    # Profile fields
+    phone_number: str | None = None
+    profile_image: str | None = None
+    address: str | None = None
+    bio: str | None = None
+    date_of_birth: str | None = None
     
     class Config:
         from_attributes = True
