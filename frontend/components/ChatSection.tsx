@@ -1,7 +1,6 @@
 "use client"
 import React, { useState, useRef, useEffect, type FormEvent } from "react"
-// --- FIX: Use the correct path alias ---
-import { useAuth } from "../context/AuthContext" 
+import { useAuth } from "../context/AuthContext"
 import { Send, Bot, User, Link as LinkIcon, Paperclip, Loader2, X, Check, Zap, Terminal, CheckCircle2 } from "lucide-react"
 import { createParser, type EventSourceMessage } from "eventsource-parser"
 import { Input } from "@/components/ui/input"
@@ -20,7 +19,7 @@ interface PlanStep {
 
 export default function ChatSection() {
   const { session, status, requestProtectedAccess, isFullyAuthenticated } = useAuth()
-  
+
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -53,19 +52,18 @@ export default function ChatSection() {
       requestProtectedAccess();
       return;
     }
-    
+
     setIsLoading(true)
     const formData = new FormData()
     formData.append("file", file)
     formData.append("user_email", session.user.email)
-    
+
     try {
-      // Call the Vercel API route
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
-      
+
       const data = await response.json()
       if (response.ok) {
         setUploadedFilePath(file.name)
@@ -83,7 +81,7 @@ export default function ChatSection() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    
+
     if (!input.trim() || !isFullyAuthenticated || !session?.accessToken || !session?.user?.email) {
       requestProtectedAccess()
       return
@@ -93,33 +91,30 @@ export default function ChatSection() {
     setMessages((prev) => [...prev, userMessage])
     setPlanSteps([])
     setIsLoading(true)
-    
-    // --- FIX: Store the raw input before clearing it ---
+
     const currentInput = input;
     setInput("")
-    // ---
 
     if (uploadedFilePath) {
-      // RAG QUERY (Call Vercel Function)
       try {
         const response = await fetch("/api/query", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            query: currentInput, // Use the stored input
+            query: currentInput,
             file_name: uploadedFilePath,
             user_email: session.user.email,
-            chat_history: messages.slice(-10), 
+            chat_history: messages.slice(-10),
           }),
         });
-        
+
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.detail || "Failed to get answer");
         }
-        
+
         setMessages((prev) => [...prev, { text: data.answer, sender: "ai" }]);
-        setUploadedFilePath(null); // Clear file after one question
+        setUploadedFilePath(null);
 
       } catch (error) {
         const msg = (error as Error).message;
@@ -129,31 +124,25 @@ export default function ChatSection() {
       }
 
     } else {
-      // AGENT QUERY (Call Render Backend)
-      
-      // --- THIS IS THE FIX ---
-      // We must construct the full message for the agent,
-      // including any attached links.
       let messageForAgent = currentInput;
       if (attachedLink) {
         messageForAgent = `(Regarding the link: ${attachedLink}) ${messageForAgent}`;
-        setAttachedLink(null); // Clear the link after sending
+        setAttachedLink(null);
       }
-      // --- END OF FIX ---
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${apiUrl}/api/chat/stream`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.accessToken}` 
+          "Authorization": `Bearer ${session.accessToken}`
         },
-        body: JSON.stringify({ 
-          message: messageForAgent, // <-- Use the full constructed message
+        body: JSON.stringify({
+          message: messageForAgent,
           access_token: session.accessToken
         }),
       })
-      
+
       if (!response.ok || !response.body) {
         setIsLoading(false)
         const errorText = await response.text()
@@ -162,7 +151,6 @@ export default function ChatSection() {
         return
       }
 
-      // Handle the agent's stream
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       const parser = createParser({
@@ -199,43 +187,68 @@ export default function ChatSection() {
       setIsLoading(false)
     }
   }
-  
+
   return (
-    <div className="flex h-screen flex-col bg-white text-black">
-      <header className="ml-8 flex shrink-0 items-center justify-between border-b-2 border-black p-4">
-        <h1 className="text-3xl font-bold" style={{ fontFamily: "'Luckiest Guy', cursive" }}>
+    <div className="flex h-screen flex-col">
+      {/* Header */}
+      <header className="flex shrink-0 items-center justify-between glass px-6 py-4 ml-0">
+        <h1 className="text-xl font-semibold text-foreground">
           Agent Chat
         </h1>
       </header>
-      
+
       <div className="flex flex-1 overflow-hidden">
+        {/* Chat area */}
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
+          <div className="flex-1 space-y-4 overflow-y-auto p-4 md:p-6">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in-up">
+                <div className="w-16 h-16 rounded-2xl glass-accent flex items-center justify-center mb-4">
+                  <Bot className="w-8 h-8 text-[#4dfce0]" />
+                </div>
+                <h2 className="text-lg font-semibold text-foreground mb-2">Start a conversation</h2>
+                <p className="text-[#64748b] text-sm max-w-md">
+                  Ask me about your schedule, upload a document, or attach a link for analysis.
+                </p>
+              </div>
+            )}
+
             {messages.map((msg, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`flex items-start gap-4 ${msg.sender === "user" ? "justify-end" : ""}`}
+                transition={{ duration: 0.2 }}
+                className={`flex items-start gap-3 ${msg.sender === "user" ? "justify-end" : ""}`}
               >
-                {msg.sender === "ai" && <Bot className="h-8 w-8 shrink-0 text-orange-500" />}
+                {msg.sender === "ai" && (
+                  <div className="w-8 h-8 rounded-lg glass-accent flex items-center justify-center shrink-0 mt-0.5">
+                    <Bot className="h-4 w-4 text-[#4dfce0]" />
+                  </div>
+                )}
                 <div
-                  style={{ fontFamily: "'Baloo 2', cursive" }}
-                  className={`max-w-lg rounded-2xl border-2 border-black px-5 py-3 shadow-[2px_2px_0px_#000] ${
-                    msg.sender === "user" ? "bg-orange-500 text-white" : "bg-white"
+                  className={`max-w-lg rounded-xl px-4 py-3 text-sm ${
+                    msg.sender === "user"
+                      ? "bg-[rgba(77,252,224,0.12)] text-foreground border border-[rgba(77,252,224,0.15)]"
+                      : "glass-card"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap text-base">{msg.text}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
                 </div>
-                {msg.sender === "user" && <User className="h-8 w-8 shrink-0 text-gray-700" />}
+                {msg.sender === "user" && (
+                  <div className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center shrink-0 mt-0.5">
+                    <User className="h-4 w-4 text-[#94a3b8]" />
+                  </div>
+                )}
               </motion.div>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Input bar */}
           <form
             onSubmit={handleSubmit}
-            className="relative ml-8 flex shrink-0 items-center gap-2 border-t-2 border-black bg-white p-4"
+            className="relative flex shrink-0 items-center gap-2 glass px-4 py-3"
           >
             <input
               type="file"
@@ -243,7 +256,7 @@ export default function ChatSection() {
               style={{ display: "none" }}
               onChange={handleFileUpload}
             />
-            
+
             {showLinkInput ? (
               <div className="flex flex-1 items-center gap-2">
                 <Input
@@ -255,34 +268,41 @@ export default function ChatSection() {
                     if (e.key === "Escape") { e.preventDefault(); setShowLinkInput(false); }
                   }}
                   autoFocus
-                  className="flex-1 border-2 border-black rounded-xl focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                  style={{ fontFamily: "'Baloo 2', cursive" }}
+                  className="flex-1"
                 />
-                <Button type="button" size="icon" onClick={confirmAttachLink} className="bg-orange-500 hover:bg-orange-600 rounded-xl border-2 border-black"><Check className="h-5 w-5"/></Button>
-                <Button type="button" size="icon" variant="ghost" onClick={() => setShowLinkInput(false)} className="rounded-xl hover:bg-gray-200"><X className="h-5 w-5"/></Button>
+                <Button type="button" size="icon" onClick={confirmAttachLink} variant="default">
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button type="button" size="icon" variant="ghost" onClick={() => setShowLinkInput(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             ) : (
               <>
-                <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isLoading || !isFullyAuthenticated} title="Attach File" className="rounded-full hover:bg-orange-100">
-                  <Paperclip className="h-6 w-6" />
+                <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isLoading || !isFullyAuthenticated} title="Attach File">
+                  <Paperclip className="h-5 w-5" />
                 </Button>
-                <Button type="button" variant="ghost" onClick={startAttachLink} size="icon" title="Attach link" className="rounded-full hover:bg-orange-100" disabled={isLoading || !isFullyAuthenticated}>
-                  <LinkIcon className="h-6 w-6" />
+                <Button type="button" variant="ghost" onClick={startAttachLink} size="icon" title="Attach link" disabled={isLoading || !isFullyAuthenticated}>
+                  <LinkIcon className="h-5 w-5" />
                 </Button>
 
                 {attachedLink && (
-                  <div className="flex items-center gap-2 rounded-full bg-orange-100 p-2 text-sm" style={{ fontFamily: "'Baloo 2', cursive" }}>
-                    <LinkIcon className="h-5 w-5 shrink-0" />
+                  <div className="flex items-center gap-2 rounded-lg glass-accent px-3 py-1.5 text-xs text-[#4dfce0]">
+                    <LinkIcon className="h-3.5 w-3.5 shrink-0" />
                     <span className="max-w-[150px] truncate">{attachedLink}</span>
-                    <button type="button" onClick={removeAttachedLink} className="p-1 hover:bg-orange-200 rounded-full"> <X className="h-4 w-4" /> </button>
+                    <button type="button" onClick={removeAttachedLink} className="p-0.5 hover:bg-white/[0.06] rounded">
+                      <X className="h-3 w-3" />
+                    </button>
                   </div>
                 )}
-                
+
                 {uploadedFilePath && (
-                  <div className="flex items-center gap-2 rounded-full bg-orange-100 p-2 text-sm" style={{ fontFamily: "'Baloo 2', cursive" }}>
-                    <Paperclip className="h-5 w-5 shrink-0" />
+                  <div className="flex items-center gap-2 rounded-lg glass-accent px-3 py-1.5 text-xs text-[#4dfce0]">
+                    <Paperclip className="h-3.5 w-3.5 shrink-0" />
                     <span className="max-w-[150px] truncate" title={uploadedFilePath}>{uploadedFilePath}</span>
-                    <button type="button" onClick={() => setUploadedFilePath(null)} className="p-1 hover:bg-orange-200 rounded-full"> <X className="h-4 w-4" /> </button>
+                    <button type="button" onClick={() => setUploadedFilePath(null)} className="p-0.5 hover:bg-white/[0.06] rounded">
+                      <X className="h-3 w-3" />
+                    </button>
                   </div>
                 )}
 
@@ -291,49 +311,51 @@ export default function ChatSection() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isFullyAuthenticated || isLoading}
-                  style={{ fontFamily: "'Baloo 2', cursive" }}
-                  className="flex-1 rounded-full border-2 border-black px-5 py-6 text-base focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                  className="flex-1 rounded-lg px-4 py-2.5 text-sm"
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className="h-12 w-12 rounded-full border-2 border-black bg-orange-500 shadow-[2px_2px_0px_#000] hover:bg-orange-600"
+                  className="h-9 w-9 rounded-lg"
                   disabled={!isFullyAuthenticated || isLoading || !input.trim()}
                   title="Send message"
                 >
-                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </>
             )}
           </form>
         </div>
-        <aside className="hidden w-80 shrink-0 border-l-2 border-black bg-orange-50 p-4 lg:flex flex-col">
-          <Card className="h-full border-4 border-black bg-white shadow-[4px_4px_0px_#000] rounded-2xl">
+
+        {/* Agent Plan sidebar */}
+        <aside className="hidden w-80 shrink-0 glass-light p-4 lg:flex flex-col border-l border-white/[0.04]">
+          <Card className="h-full rounded-xl">
             <CardHeader>
-              <CardTitle className="text-2xl" style={{ fontFamily: "'Luckiest Guy', cursive" }}>
+              <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#4dfce0]" />
                 Agent Plan
               </CardTitle>
             </CardHeader>
             <CardContent className="overflow-y-auto">
               {planSteps.length === 0 && (
-                <p className="text-gray-800" style={{ fontFamily: "'Baloo 2', cursive" }}>
+                <p className="text-[#64748b] text-sm">
                   {isLoading ? "Agent is thinking..." : "The agent's real-time plan will appear here."}
                 </p>
               )}
-              <div className="relative space-y-4">
-                {planSteps.length > 1 && <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-300"></div>}
+              <div className="relative space-y-3">
+                {planSteps.length > 1 && <div className="absolute left-[15px] top-4 bottom-4 w-px bg-white/[0.06]"></div>}
                 <AnimatePresence>
                   {planSteps.map((step, index) => {
                     const Icon = step.type === "Tool Call" ? Zap : step.type === "Tool Output" ? Terminal : CheckCircle2;
-                    const color = step.type === "Tool Call" ? "text-orange-600" : step.type === "Tool Output" ? "text-gray-600" : "text-green-600";
+                    const color = step.type === "Tool Call" ? "text-[#4dfce0]" : step.type === "Tool Output" ? "text-[#94a3b8]" : "text-emerald-400";
                     return (
-                      <motion.div key={index} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 flex items-start gap-4">
-                        <div className={`shrink-0 rounded-full border-2 border-gray-300 bg-white p-2 ${color}`}>
-                          <Icon className="h-5 w-5" />
+                      <motion.div key={index} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 flex items-start gap-3">
+                        <div className={`shrink-0 rounded-lg bg-white/[0.04] border border-white/[0.06] p-1.5 ${color}`}>
+                          <Icon className="h-3.5 w-3.5" />
                         </div>
-                        <div className="flex-1" style={{ fontFamily: "'Baloo 2', cursive" }}>
-                          <p className={`font-bold ${color}`}>{step.type}</p>
-                          <p className="wrap-break-words text-sm text-gray-800">{step.content}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-xs font-semibold ${color}`}>{step.type}</p>
+                          <p className="break-words text-xs text-[#94a3b8] leading-relaxed">{step.content}</p>
                         </div>
                       </motion.div>
                     );

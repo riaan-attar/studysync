@@ -6,15 +6,15 @@ import GenerateRoadmap from "@/app/components/GenerateRoadmap"
 
 import { useAuth } from "@/context/AuthContext"
 
-// Helper component for tabs
+// Tab button with accent indicator
 const TabButton = ({ isActive, onClick, children }: { isActive: boolean, onClick: () => void, children: React.ReactNode }) => (
   <Button
     onClick={onClick}
     variant="ghost"
-    className={`pb-2 text-lg font-bold rounded-none border-b-4
-      ${isActive 
-        ? 'text-orange-500 border-orange-500' 
-        : 'text-gray-400 border-transparent hover:text-gray-600'
+    className={`pb-2 text-sm font-medium rounded-none border-b-2 transition-all duration-200
+      ${isActive
+        ? 'text-[#4dfce0] border-[#4dfce0]'
+        : 'text-[#64748b] border-transparent hover:text-[#94a3b8]'
       }
     `}
   >
@@ -27,15 +27,16 @@ export default function AdvisorView() {
   const { session, isFullyAuthenticated, requestProtectedAccess } = useAuth()
 
   return (
-    <div className="flex flex-col h-full bg-white text-black">
-      <header className="flex items-center ml-8 border-b-2 border-black bg-white p-4 justify-between flex-wrap">
-        <h1 className="text-3xl font-bold ml-8" style={{ fontFamily: "'Luckiest Guy', cursive" }}>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <header className="flex items-center glass px-6 py-4 justify-between flex-wrap">
+        <h1 className="text-xl font-semibold text-foreground">
           Advisor Agent
         </h1>
       </header>
 
       {/* Tab Navigation */}
-      <div className="ml-8 px-4 md:px-8 border-b-2 border-gray-200">
+      <div className="px-6 border-b border-white/[0.06]">
         <div className="flex gap-4">
           <TabButton isActive={view === 'generate'} onClick={() => setView('generate')}>
             Generate New
@@ -45,20 +46,20 @@ export default function AdvisorView() {
           </TabButton>
         </div>
       </div>
-      
+
       {/* Conditional View Rendering */}
       <div className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="w-full max-w-4xl mx-auto">
           {view === 'generate' && (
-            <GenerateRoadmap 
-              session={session} 
-              isFullyAuthenticated={isFullyAuthenticated} 
+            <GenerateRoadmap
+              session={session}
+              isFullyAuthenticated={isFullyAuthenticated}
               requestProtectedAccess={requestProtectedAccess}
             />
           )}
           {view === 'my_roadmaps' && (
-            <MyRoadmaps 
-              session={session} 
+            <MyRoadmaps
+              session={session}
               isFullyAuthenticated={isFullyAuthenticated}
             />
           )}

@@ -14,7 +14,13 @@ export default function Dashboard() {
   const [currentView, setCurrentView] = useState("home")
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex">
+    <div className="min-h-screen bg-[#0a0a0f] text-foreground flex relative">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="ambient-orb w-[600px] h-[600px] -top-[200px] -left-[100px]" />
+        <div className="ambient-orb w-[400px] h-[400px] bottom-[10%] right-[5%] opacity-[0.06]" />
+      </div>
+
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -22,21 +28,21 @@ export default function Dashboard() {
         setSidebarOpen={setSidebarOpen}
       />
 
-      {/* Hamburger button overlays properly on mobile */}
+      {/* Mobile hamburger */}
       <Button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="fixed top-4 left-4 z-60 md:hidden"
         variant="outline"
         size="icon"
       >
-        <MenuIcon className="w-6 h-6" />
+        <MenuIcon className="w-5 h-5" />
       </Button>
 
-      {/* Main content with left padding matching smaller sidebar width (w-56 = 224px) */}
-      <main className="flex flex-1 flex-col transition-all duration-300 md:pl-70">
+      {/* Main content */}
+      <main className="flex flex-1 flex-col transition-all duration-300 md:pl-64 relative z-10">
         {currentView === "home" && (
-  <LandingPage setCurrentView={setCurrentView} />
-)}
+          <LandingPage setCurrentView={setCurrentView} />
+        )}
         {currentView === "chat" && <ChatSection />}
         {currentView === "updates" && <UpdatesView />}
         {currentView === "advisor" && <AdvisorView />}

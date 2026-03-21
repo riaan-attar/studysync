@@ -1,12 +1,11 @@
-// In your Sidebar component file
+// Sidebar.tsx — Obsidian dark glassmorphism sidebar
 
 "use client"
 
 import { Button } from "@/components/ui/button"
-// --- 1. Import 'LogIn' from lucide-react ---
-import { MessageSquare, Mail, Zap, Home as HomeIcon, LogOut, LogIn } from "lucide-react" 
+import { MessageSquare, Mail, Zap, Home as HomeIcon, LogOut, LogIn } from "lucide-react"
 import React from "react"
-import { useAuth } from "@/context/AuthContext" 
+import { useAuth } from "@/context/AuthContext"
 import { signOut } from "next-auth/react"
 
 interface SidebarProps {
@@ -25,16 +24,21 @@ const NavButton = ({
   onClick: () => void
   children: React.ReactNode
 }) => {
-  const baseClasses = "justify-start w-full text-lg py-3 px-4 rounded-2xl transition-all duration-300 border-2"
-  const activeClasses = "bg-orange-500 text-white border-black font-bold shadow-[2px_2px_0px_#000] hover:bg-orange-600"
-  const inactiveClasses = "bg-transparent text-black border-transparent hover:bg-orange-100 hover:border-black"
-
   return (
     <button
       onClick={onClick}
-      className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
-      style={{ fontFamily: "'Baloo 2', cursive" }}
+      className={`
+        relative justify-start w-full text-sm py-2.5 px-3 rounded-lg transition-all duration-200 font-medium
+        ${isActive
+          ? "bg-[rgba(77,252,224,0.1)] text-[#4dfce0]"
+          : "bg-transparent text-[#94a3b8] hover:bg-white/[0.04] hover:text-[#e2e8f0]"
+        }
+      `}
     >
+      {/* Active indicator bar */}
+      {isActive && (
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#4dfce0] rounded-r-full shadow-[0_0_8px_rgba(77,252,224,0.4)]" />
+      )}
       <div className="flex items-center">{children}</div>
     </button>
   )
@@ -50,85 +54,86 @@ export default function Sidebar({
 
   const handleNavigation = (view: string) => {
     let accessGranted = true;
-    
+
     if (view !== 'home') {
       accessGranted = requestProtectedAccess();
     }
-    
+
     if (accessGranted) {
       setCurrentView(view)
-      setSidebarOpen(false) 
+      setSidebarOpen(false)
     }
   }
 
-  // --- DEBUGGING: New click handler ---
   const handleSignInClick = () => {
-    console.log("Sidebar: Sign In button clicked!"); // <-- ** THIS IS THE DEBUG LINE **
     requestProtectedAccess();
   }
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-70 flex-col border-r-2 border-black bg-white p-6 md:flex ${
+      className={`fixed inset-y-0 left-0 z-50 w-64 flex-col glass-sidebar p-5 md:flex ${
         sidebarOpen ? "flex" : "hidden"
       }`}
     >
-      <h2
-        className="text-4xl font-bold text-black"
-        style={{ fontFamily: "'Luckiest Guy', cursive", letterSpacing: "-1px" }}
-      >
-        Study Scan
-      </h2>
+      {/* Brand */}
+      <div className="flex items-center gap-2 px-1 mb-1">
+        <h2 className="text-xl font-bold gradient-text tracking-tight">
+          StudySync
+        </h2>
+      </div>
 
-      <div className="my-4 h-0.5 w-full rounded-full bg-black"></div>
+      <div className="my-4 h-px w-full bg-white/[0.06]" />
 
-      <nav className="flex flex-col space-y-2 mt-4">
+      {/* Navigation */}
+      <nav className="flex flex-col space-y-1 mt-1">
         <NavButton isActive={currentView === "home"} onClick={() => handleNavigation("home")}>
-          <HomeIcon className="mr-3 h-5 w-5" />
+          <HomeIcon className="mr-3 h-4 w-4" />
           Home
         </NavButton>
         <NavButton isActive={currentView === "chat"} onClick={() => handleNavigation("chat")}>
-          <MessageSquare className="mr-3 h-5 w-5" />
+          <MessageSquare className="mr-3 h-4 w-4" />
           Agent Chat
         </NavButton>
         <NavButton isActive={currentView === "updates"} onClick={() => handleNavigation("updates")}>
-          <Mail className="mr-3 h-5 w-5" />
+          <Mail className="mr-3 h-4 w-4" />
           Mail Updates
         </NavButton>
         <NavButton isActive={currentView === "advisor"} onClick={() => handleNavigation("advisor")}>
-          <Zap className="mr-3 h-5 w-5" />
+          <Zap className="mr-3 h-4 w-4" />
           Advisor Agent
         </NavButton>
       </nav>
 
-      <div className="mt-auto pt-4 border-t-2 border-black">
+      {/* User section */}
+      <div className="mt-auto pt-4 border-t border-white/[0.06]">
         {status === 'authenticated' && session?.user ? (
-          <div className="flex items-center justify-between">
-            <span
-              className="truncate text-base font-bold text-gray-800"
-              style={{ fontFamily: "'Baloo 2', cursive" }}
-            >
-              {session.user?.name || session.user?.email}
-            </span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-[rgba(77,252,224,0.1)] flex items-center justify-center shrink-0">
+                <span className="text-xs font-semibold text-[#4dfce0]">
+                  {(session.user?.name || session.user?.email || '?').charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <span className="truncate text-sm text-[#94a3b8]">
+                {session.user?.name || session.user?.email}
+              </span>
+            </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => signOut()}
-              className="hover:text-orange-500 hover:bg-orange-100 rounded-full"
+              className="text-[#64748b] hover:text-[#ef4444] hover:bg-[rgba(239,68,68,0.08)] rounded-lg shrink-0"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         ) : (
-          // --- 2. THIS IS THE NEW CODE ---
-          // Replaced the "Not signed in" text with a clear "Sign In" button.
           <Button
-            onClick={handleSignInClick} // <-- ** USING THE NEW HANDLER **
-            className="justify-start w-full text-lg py-3 px-4 rounded-2xl transition-all duration-300 border-2 border-black bg-orange-500 text-white font-bold shadow-[2px_2px_0px_#000] hover:bg-orange-600"
-            style={{ fontFamily: "'Baloo 2', cursive" }}
+            onClick={handleSignInClick}
+            className="justify-start w-full text-sm py-2.5 px-3 rounded-lg font-medium bg-[rgba(77,252,224,0.1)] text-[#4dfce0] hover:bg-[rgba(77,252,224,0.15)] border border-[rgba(77,252,224,0.2)] transition-all duration-200"
           >
             <div className="flex items-center">
-              <LogIn className="mr-3 h-5 w-5" />
+              <LogIn className="mr-3 h-4 w-4" />
               Sign In
             </div>
           </Button>

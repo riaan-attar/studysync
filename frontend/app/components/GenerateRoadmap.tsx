@@ -23,29 +23,6 @@ export interface Roadmap {
 }
 type JsonData = Record<string, unknown>;
 
-interface CustomButtonProps extends React.ComponentProps<typeof Button> {
-  children: React.ReactNode;
-}
-const PrimaryButton = ({ children, ...props }: CustomButtonProps) => (
-  <Button
-    {...props}
-    style={{
-      fontFamily: "'Luckiest Guy', cursive",
-      boxShadow: "2px 2px 0px #000",
-    }}
-    className="bg-orange-500 text-white border-2 border-black rounded-xl px-6 py-2 text-base hover:bg-orange-600"
-  >
-    {children}
-  </Button>
-);
-const DoodleInput = (props: React.ComponentProps<typeof Input>) => (
-  <Input
-    {...props}
-    style={{ fontFamily: "'Baloo 2', cursive" }}
-    className="border-2 border-black rounded-xl focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 text-base"
-  />
-);
-
 // --- Props type ---
 interface GenerateRoadmapProps {
   session: Session | null;
@@ -137,7 +114,6 @@ export default function GenerateRoadmap({
         .trim();
 
       const jsonBlocks = extractAllJsonObjects(cleaned);
-      console.log("[parseRoadmapResponse] Found JSON blocks:", jsonBlocks.length);
 
       if (jsonBlocks.length === 0) {
         throw new Error("No JSON blocks found in response");
@@ -169,10 +145,6 @@ export default function GenerateRoadmap({
               }
             );
             const roadmapObj: Roadmap = { goal: String(parsed.goal), steps };
-            console.log(
-              "[parseRoadmapResponse] Parsed valid roadmap from block index",
-              i
-            );
             return roadmapObj;
           }
         } catch {
@@ -199,10 +171,6 @@ export default function GenerateRoadmap({
                 }
               );
               const roadmapObj: Roadmap = { goal: String(parsed.goal), steps };
-              console.log(
-                "[parseRoadmapResponse] Parsed valid roadmap after minor fix from block index",
-                i
-              );
               return roadmapObj;
             }
           } catch {
@@ -252,7 +220,6 @@ export default function GenerateRoadmap({
       });
       if (!response.ok) throw new Error("Failed to save roadmap");
       const data = await response.json();
-      console.log("Roadmap saved to database.");
       return { ...roadmapObj, ...data.roadmap };
     } catch (error) {
       console.error("Failed to save roadmap:", error);
@@ -305,11 +272,6 @@ export default function GenerateRoadmap({
 
               const parsedRoadmap = parseRoadmapResponse(roadmapJsonString);
               finalRoadmap = parsedRoadmap;
-            } else if (event.event === "tool_start") {
-              console.log(
-                "Advisor agent started tool:",
-                JSON.parse(event.data)
-              );
             }
           } catch (e) {
             console.error("Streaming parse error:", e);
@@ -365,15 +327,12 @@ export default function GenerateRoadmap({
 
   return (
     <div>
-      <p
-        className="text-gray-800 mb-6 text-lg"
-        style={{ fontFamily: "'Baloo 2', cursive" }}
-      >
+      <p className="text-[#94a3b8] mb-6 text-sm">
         Ask for a plan to achieve a goal, and the agent will generate a
         step-by-step roadmap for you.
       </p>
       <form onSubmit={handleSubmit} className="flex items-center gap-2 mb-8">
-        <DoodleInput
+        <Input
           placeholder="e.g., 'Prepare for Google Summer of Code'"
           value={goal}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -382,7 +341,7 @@ export default function GenerateRoadmap({
           disabled={isLoading}
           className="flex-1"
         />
-        <PrimaryButton
+        <Button
           type="submit"
           disabled={isLoading || !goal.trim() || !isFullyAuthenticated}
         >
@@ -394,12 +353,12 @@ export default function GenerateRoadmap({
           ) : (
             "Generate Plan"
           )}
-        </PrimaryButton>
+        </Button>
       </form>
 
       {isLoading && (
         <div className="flex justify-center items-center p-12">
-          <Loader2 className="h-12 w-12 animate-spin text-orange-500" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#4dfce0]" />
         </div>
       )}
 

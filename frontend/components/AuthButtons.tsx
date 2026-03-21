@@ -1,17 +1,17 @@
-// In frontend/components/AuthButtons.tsx
+// frontend/components/AuthButtons.tsx
 
 'use client';
 
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { useEffect } from 'react'; // <-- IMPORT useEffect
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { LogIn, LogOut } from 'lucide-react';
 
 export default function AuthButtons() {
   const { data: session, status } = useSession();
 
-  // ADD THIS useEffect HOOK
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.email) {
-      // User has just logged in, so we notify our backend
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       fetch(`${apiUrl}/api/users/login`, {
         method: 'POST',
@@ -23,27 +23,29 @@ export default function AuthButtons() {
       .catch(error => console.error('Error notifying backend of login:', error));
     }
   }, [status, session]);
-  
+
   if (session) {
     return (
       <div className="flex items-center space-x-4">
-        <p>Signed in as {session.user?.email}</p>
-        <button 
+        <p className="text-sm text-[#94a3b8]">Signed in as {session.user?.email}</p>
+        <Button
           onClick={() => signOut()}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg"
+          variant="outline"
+          className="text-red-400 hover:bg-red-400/10 hover:text-red-300"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Sign out
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <button 
+    <Button
       onClick={() => signIn('google')}
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
     >
+      <LogIn className="w-4 h-4 mr-2" />
       Sign in with Google
-    </button>
+    </Button>
   );
 }
