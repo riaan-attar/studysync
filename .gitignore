@@ -14,7 +14,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 temp    
 ./temp  
 extra
-
+/extra
 # Runtime data
 pids
 *.pid
