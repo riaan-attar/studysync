@@ -12,7 +12,7 @@ import os # Import os
 INPUT_CSV = "mail_dataset.csv"
 MODEL_NAME = "distilbert-base-uncased" # The model we are fine-tuning
 NEW_MODEL_NAME = "campus-mail-classifier" # The name for your new, saved model
-HF_USERNAME = "aviralsaxena16" # REPLACE THIS WITH YOUR HUGGING FACE USERNAME
+HF_USERNAME = "riaan6226" # REPLACE THIS WITH YOUR HUGGING FACE USERNAME
 
 # Our 5 labels
 LABELS = ["DEADLINE", "CAREER", "EVENT", "SPAM/PROMO", "GENERAL"]

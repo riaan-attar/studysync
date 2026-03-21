@@ -8,7 +8,7 @@
 
 # # !! THIS IS THE ONLY LINE YOU NEED TO CHANGE !!
 # # Replace this with your actual Hugging Face Model ID
-# MODEL_ID = "aviralsaxena16/campus-mail-classifier" 
+# MODEL_ID = "riaan6226/studysync" 
 
 # # --- 2. Define Labels ---
 # # These MUST match the order from your training
