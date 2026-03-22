@@ -1,6 +1,7 @@
 "use client"
 import React from "react"
 import { CalendarClock, FileText, Zap, BookOpen, Layers, Target, ArrowRight } from "lucide-react"
+import { useAuth } from "../context/AuthContext"
 
 interface LandingPageProps {
   setCurrentView: React.Dispatch<React.SetStateAction<string>>
@@ -101,6 +102,16 @@ const HowItWorksStep = ({ stepNumber, title, description, icon }: { stepNumber: 
 );
 
 export default function LandingPage({ setCurrentView }: LandingPageProps) {
+  const { isFullyAuthenticated, requestProtectedAccess } = useAuth();
+
+  const handleGetStarted = () => {
+    if (isFullyAuthenticated) {
+      setCurrentView('chat');
+    } else {
+      requestProtectedAccess();
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col text-foreground relative overflow-x-hidden">
 
@@ -127,7 +138,7 @@ export default function LandingPage({ setCurrentView }: LandingPageProps) {
               clear and under control.
             </p>
             <button
-              onClick={() => setCurrentView('chat')}
+              onClick={handleGetStarted}
               className="group inline-flex items-center gap-2 px-8 py-3.5 bg-[#4dfce0] text-[#0a0a0f] font-semibold rounded-lg text-lg hover:bg-[#3ae0c6] hover:shadow-[0_0_30px_rgba(77,252,224,0.3)] transition-all duration-300 active:scale-[0.98]"
             >
               Get Started
