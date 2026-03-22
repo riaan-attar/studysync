@@ -191,8 +191,8 @@ export default function ChatSection() {
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
-      <header className="flex shrink-0 items-center justify-between glass px-6 py-4 ml-0">
-        <h1 className="text-xl font-semibold text-foreground">
+      <header className="flex shrink-0 items-center justify-between glass px-4 sm:px-6 py-3 sm:py-4 ml-0">
+        <h1 className="text-lg sm:text-xl font-semibold text-foreground">
           Agent Chat
         </h1>
       </header>
@@ -248,7 +248,7 @@ export default function ChatSection() {
           {/* Input bar */}
           <form
             onSubmit={handleSubmit}
-            className="relative flex shrink-0 items-center gap-2 glass px-4 py-3"
+            className="relative flex shrink-0 items-center gap-1.5 sm:gap-2 glass px-3 sm:px-4 py-2 sm:py-3"
           >
             <input
               type="file"
@@ -279,11 +279,11 @@ export default function ChatSection() {
               </div>
             ) : (
               <>
-                <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isLoading || !isFullyAuthenticated} title="Attach File">
-                  <Paperclip className="h-5 w-5" />
+                <Button type="button" size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={isLoading || !isFullyAuthenticated} title="Attach File" className="h-8 w-8 sm:h-9 sm:w-9">
+                  <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
-                <Button type="button" variant="ghost" onClick={startAttachLink} size="icon" title="Attach link" disabled={isLoading || !isFullyAuthenticated}>
-                  <LinkIcon className="h-5 w-5" />
+                <Button type="button" variant="ghost" onClick={startAttachLink} size="icon" title="Attach link" disabled={isLoading || !isFullyAuthenticated} className="h-8 w-8 sm:h-9 sm:w-9">
+                  <LinkIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
 
                 {attachedLink && (
@@ -307,20 +307,20 @@ export default function ChatSection() {
                 )}
 
                 <Input
-                  placeholder={uploadedFilePath ? "Ask a question about your PDF..." : "Ask your agent..."}
+                  placeholder={uploadedFilePath ? "Ask a question..." : "Ask your agent..."}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={!isFullyAuthenticated || isLoading}
-                  className="flex-1 rounded-lg px-4 py-2.5 text-sm"
+                  className="flex-1 rounded-lg px-3 py-2 text-sm"
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className="h-9 w-9 rounded-lg"
+                  className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg"
                   disabled={!isFullyAuthenticated || isLoading || !input.trim()}
                   title="Send message"
                 >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 sm:h-5 sm:w-5" />}
                 </Button>
               </>
             )}

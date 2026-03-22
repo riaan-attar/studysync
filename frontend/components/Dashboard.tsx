@@ -47,6 +47,14 @@ export default function Dashboard() {
         setSidebarOpen={setSidebarOpen}
       />
 
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Mobile hamburger */}
       <Button
         onClick={() => setSidebarOpen(!sidebarOpen)}

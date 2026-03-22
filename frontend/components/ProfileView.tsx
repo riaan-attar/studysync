@@ -113,7 +113,7 @@ export default function ProfileView() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar relative px-6 py-8">
+    <div className="flex-1 overflow-y-auto custom-scrollbar relative px-4 sm:px-6 py-6 sm:py-8">
       {/* Background elements */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full opacity-20 bg-gradient-to-br from-[#4dfce0]/20 to-transparent blur-[120px] pointer-events-none" />
       
@@ -265,7 +265,7 @@ export default function ProfileView() {
                 <Button 
                   type="submit" 
                   disabled={isSaving}
-                  className="px-8 py-6 rounded-lg font-semibold bg-[#4dfce0] text-[#0a0a0f] hover:bg-[#3ae0c6] hover:shadow-[0_0_20px_rgba(77,252,224,0.3)] transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto px-8 py-5 sm:py-6 rounded-lg font-semibold bg-[#4dfce0] text-[#0a0a0f] hover:bg-[#3ae0c6] hover:shadow-[0_0_20px_rgba(77,252,224,0.3)] transition-all flex items-center justify-center gap-2"
                 >
                   {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                   {isSaving ? 'Saving...' : 'Save Profile'}

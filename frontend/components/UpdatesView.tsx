@@ -138,7 +138,7 @@ const TriageColumn = ({
   }
 
   return (
-    <div className="flex-1 min-w-[300px]">
+    <div className="flex-1 min-w-0 sm:min-w-[300px]">
       <h3 className="text-lg font-semibold mb-4 text-foreground">
         {title}
       </h3>
@@ -297,8 +297,8 @@ export default function UpdatesView() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center justify-between glass px-6 py-4 flex-wrap gap-4">
-        <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
+      <header className="flex items-center justify-between glass px-4 sm:px-6 py-3 sm:py-4 flex-wrap gap-4">
+        <h1 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
           <Mail className="w-5 h-5 text-[#4dfce0]" />
           Mail Triage
         </h1>

@@ -80,8 +80,8 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-64 flex-col glass-sidebar p-5 md:flex ${
-        sidebarOpen ? "flex" : "hidden"
+      className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[calc(100vw-3rem)] flex-col glass-sidebar p-5 transition-transform duration-300 md:flex ${
+        sidebarOpen ? "translate-x-0 flex" : "-translate-x-full hidden md:translate-x-0 md:flex"
       }`}
     >
       {/* Brand */}
@@ -111,7 +111,7 @@ export default function Sidebar({
       </nav>
 
       {/* User section */}
-      <div className="absolute bottom-0 w-full p-4 border-t border-white/[0.08] bg-black/20 backdrop-blur-md">
+      <div className="mt-auto pt-4 border-t border-white/[0.08] bg-black/20 backdrop-blur-md -mx-5 px-5 pb-5">
         {status === 'authenticated' && session?.user ? (
           <div className="flex items-center justify-between px-2">
             <div

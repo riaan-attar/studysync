@@ -29,15 +29,15 @@ export default function AdvisorView() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center glass px-6 py-4 justify-between flex-wrap">
-        <h1 className="text-xl font-semibold text-foreground">
+      <header className="flex items-center glass px-4 sm:px-6 py-3 sm:py-4 justify-between flex-wrap gap-2">
+        <h1 className="text-lg sm:text-xl font-semibold text-foreground">
           Advisor Agent
         </h1>
       </header>
 
       {/* Tab Navigation */}
-      <div className="px-6 border-b border-white/[0.06]">
-        <div className="flex gap-4">
+      <div className="px-4 sm:px-6 border-b border-white/[0.06]">
+        <div className="flex gap-2 sm:gap-4">
           <TabButton isActive={view === 'generate'} onClick={() => setView('generate')}>
             Generate New
           </TabButton>

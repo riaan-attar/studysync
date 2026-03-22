@@ -13,7 +13,7 @@ const AnimatedGlobe = () => (
     {/* Ambient glow */}
     <div className="absolute w-72 h-72 rounded-full bg-[#4dfce0]/10 blur-[80px]" />
 
-    <div className="relative w-64 h-64 md:w-80 md:h-80">
+    <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
       {/* Globe sphere */}
       <div className="absolute inset-0 rounded-full border border-[#4dfce0]/20 bg-gradient-to-br from-[#4dfce0]/5 via-transparent to-[#4dfce0]/3" />
 
@@ -116,23 +116,23 @@ export default function LandingPage({ setCurrentView }: LandingPageProps) {
     <div className="min-h-screen w-full flex flex-col text-foreground relative overflow-x-hidden">
 
       {/* Section 1: Hero */}
-      <section className="flex items-center justify-center grow pt-20 pb-16 px-6 lg:px-24 relative overflow-visible">
+      <section className="flex items-center justify-center grow pt-12 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-24 relative overflow-visible">
         {/* Background gradient */}
         <div className="absolute inset-0 gradient-bg pointer-events-none" />
 
-        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-16 z-10 relative">
+        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16 z-10 relative">
           {/* Left Side: Text Content */}
-          <div className="space-y-8 text-center lg:text-left relative">
-            <h1 className="text-6xl md:text-7xl font-bold mb-2 tracking-tight">
+          <div className="space-y-6 sm:space-y-8 text-center lg:text-left relative">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-2 tracking-tight">
               Study<br />
               <span className="gradient-text" style={{ fontSize: "1em" }}>
                 Sync
               </span>
             </h1>
-            <p className="text-xl font-medium text-[#e2e8f0]/80 mb-2 italic">
+            <p className="text-lg sm:text-xl font-medium text-[#e2e8f0]/80 mb-2 italic">
               Never miss a moment that matters.
             </p>
-            <p className="text-lg text-[#94a3b8] leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-base sm:text-lg text-[#94a3b8] leading-relaxed max-w-xl mx-auto lg:mx-0">
               Stay ahead of your deadlines, events, and goals with your smart AI-powered planner.
               StudySync brings together schedules, updates, and insights — so student life feels
               clear and under control.
@@ -146,14 +146,14 @@ export default function LandingPage({ setCurrentView }: LandingPageProps) {
             </button>
           </div>
           {/* Right Side: Animated Globe */}
-          <div className="hidden lg:flex relative h-[500px] items-center justify-center">
+          <div className="flex relative h-[300px] sm:h-[400px] lg:h-[500px] items-center justify-center lg:order-last order-first">
             <AnimatedGlobe />
           </div>
         </div>
       </section>
 
       {/* Section 2: Features */}
-      <section className="py-24 px-6 relative">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(77,252,224,0.02)] to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="space-y-3 mb-16">
@@ -186,7 +186,7 @@ export default function LandingPage({ setCurrentView }: LandingPageProps) {
       </section>
 
       {/* Section 3: How It Works */}
-      <section className="py-24 px-6 relative">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 relative">
         <div className="max-w-7xl mx-auto text-center">
           <div className="space-y-3 mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground">
