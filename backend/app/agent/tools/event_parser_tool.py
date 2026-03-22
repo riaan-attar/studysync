@@ -40,7 +40,7 @@ class EventParserTool(BaseTool):
             print(f"[DEBUG] Parsing text of length: {len(text_to_parse)}")
 
             llm = ChatGoogleGenerativeAI(
-                model="gemini-2.5-flash",
+                model=os.getenv("GOOGLE_AI_MODEL", "gemma-3-27b-it"),
                 google_api_key=GOOGLE_API_KEY,
                 temperature=0
             )

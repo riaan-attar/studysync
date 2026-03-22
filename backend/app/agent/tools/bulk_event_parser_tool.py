@@ -13,7 +13,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY is not set!")
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"), temperature=0)
+llm = ChatGoogleGenerativeAI(model=os.getenv("GOOGLE_AI_MODEL", "gemma-3-27b-it"), google_api_key=os.getenv("GOOGLE_API_KEY"), temperature=0)
 
 class BulkParserInput(BaseModel):
     text_to_parse: str = Field(description="A large block of text that may contain multiple events or contests.")

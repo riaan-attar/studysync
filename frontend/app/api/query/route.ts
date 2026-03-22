@@ -30,7 +30,7 @@ const embeddings = new HuggingFaceInferenceEmbeddings({
 });
 
 const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash",
+  model: process.env.GOOGLE_AI_MODEL || "gemma-3-27b-it",
 });
 
 export async function POST(req: Request) {
