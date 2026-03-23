@@ -112,14 +112,14 @@ export default function ProfileView() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar relative px-4 sm:px-6 py-6 sm:py-8">
+    <div className="flex-1 overflow-y-auto custom-scrollbar relative pl-14 pr-4 sm:px-6 pt-[17px] pb-6 sm:py-8">
       {/* Background elements */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full opacity-20 bg-gradient-to-br from-[#4dfce0]/20 to-transparent blur-[120px] pointer-events-none" />
       
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         
         {/* Header */}
-        <div>
+        <div className="pl-10 sm:pl-0">
           <h1 className="text-3xl font-bold text-foreground">Your Profile</h1>
           <p className="text-[#94a3b8] mt-2 text-sm">Manage your personal information and avatar</p>
         </div>

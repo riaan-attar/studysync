@@ -297,7 +297,7 @@ export default function UpdatesView() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center justify-between glass px-4 sm:px-6 py-3 sm:py-4 flex-wrap gap-4">
+      <header className="flex h-16 sm:h-auto items-center justify-between glass pl-14 pr-4 sm:px-6 py-0 sm:py-4 flex-wrap gap-4">
         <h1 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
           <Mail className="w-5 h-5 text-[#4dfce0]" />
           Mail Triage

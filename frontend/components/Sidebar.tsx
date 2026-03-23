@@ -85,7 +85,7 @@ export default function Sidebar({
       }`}
     >
       {/* Brand */}
-      <div className="flex items-center gap-2 px-1 mb-1">
+      <div className="flex items-center gap-2 px-1 mb-1 pl-12 md:pl-1">
         <h2 className="text-xl font-bold gradient-text tracking-tight">
           StudySync
         </h2>

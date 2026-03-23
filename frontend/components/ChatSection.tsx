@@ -191,7 +191,7 @@ export default function ChatSection() {
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
-      <header className="flex shrink-0 items-center justify-between glass px-4 sm:px-6 py-3 sm:py-4 ml-0">
+      <header className="flex h-16 sm:h-auto shrink-0 items-center justify-between glass pl-14 pr-4 sm:px-6 py-0 sm:py-4 ml-0">
         <h1 className="text-lg sm:text-xl font-semibold text-foreground">
           Agent Chat
         </h1>

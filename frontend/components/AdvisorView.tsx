@@ -29,7 +29,7 @@ export default function AdvisorView() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center glass px-4 sm:px-6 py-3 sm:py-4 justify-between flex-wrap gap-2">
+      <header className="flex h-16 sm:h-auto items-center glass pl-14 pr-4 sm:px-6 py-0 sm:py-4 justify-between flex-wrap gap-2">
         <h1 className="text-lg sm:text-xl font-semibold text-foreground">
           Advisor Agent
         </h1>

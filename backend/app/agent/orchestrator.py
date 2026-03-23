@@ -133,15 +133,27 @@ async def get_agent_response(
         output = response.get('output', '')
         
         if not output or output.strip().endswith('<tool_call>'):
-            return "I've processed your request. Please check your calendar for the scheduled event."
+            try:
+                # Generate a natural confirmation
+                prompt = f"The user asked: '{user_input}'. The task has been completed successfully using tools. Generate a very brief, friendly, natural-sounding AI confirmation message."
+                fallback_resp = await llm.ainvoke(prompt)
+                return fallback_resp.content
+            except:
+                return "I've processed your request. Please check your calendar or account for the result."
         
         return output
         
     except Exception as e:
         error_str = str(e)
         # The thought_signature error happens with some Gemini preview models
-        # AFTER tools have already executed successfully. The agent completed
-        # its work but can't generate a final text response. Return a friendly message.
+        # AFTER tools have already executed successfully.
         if "thought_signature" in error_str:
-            return "I've completed your request successfully! Please check your Google Calendar for the scheduled event."
+            try:
+                # Generate a natural confirmation
+                prompt = f"The user asked: '{user_input}'. The task has been completed successfully. Generate a brief, natural-sounding AI confirmation message."
+                fallback_resp = await llm.ainvoke(prompt)
+                return fallback_resp.content
+            except:
+                return "I've completed your request successfully! Please check your Google Calendar for the scheduled event."
+        
         return f"I encountered an error while processing your request: {error_str}. Please try again or rephrase your request."

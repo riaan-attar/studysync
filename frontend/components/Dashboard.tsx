@@ -58,7 +58,7 @@ export default function Dashboard() {
       {/* Mobile hamburger */}
       <Button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-60 md:hidden"
+        className="fixed top-[14px] left-4 z-60 md:hidden"
         variant="outline"
         size="icon"
       >
