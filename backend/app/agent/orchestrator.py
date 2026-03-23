@@ -134,8 +134,23 @@ async def get_agent_response(
         
         if not output or output.strip().endswith('<tool_call>'):
             try:
+                # Try to find tool output for better fallback
+                last_tool_output = None
+                if "callbacks" in config:
+                    for cb in config["callbacks"]:
+                        if hasattr(cb, 'last_tool_output'):
+                            last_tool_output = cb.last_tool_output
+                            break
+
                 # Generate a natural confirmation
-                prompt = f"The user asked: '{user_input}'. The task has been completed successfully using tools. Generate a very brief, friendly, natural-sounding AI confirmation message."
+                prompt = f"The user asked: '{user_input}'."
+                if last_tool_output:
+                    prompt += f" The tool returned this data: {last_tool_output}. Include this information in your response."
+                else:
+                    prompt += " The task has been completed successfully using tools."
+                
+                prompt += " Generate a very brief, friendly, natural-sounding AI confirmation message."
+                
                 fallback_resp = await llm.ainvoke(prompt)
                 return fallback_resp.content
             except:
@@ -145,12 +160,28 @@ async def get_agent_response(
         
     except Exception as e:
         error_str = str(e)
+        
+        # Try to find the tool output from callbacks for a better fallback
+        last_tool_output = None
+        if "callbacks" in config:
+            for cb in config["callbacks"]:
+                if hasattr(cb, 'last_tool_output'):
+                    last_tool_output = cb.last_tool_output
+                    break
+
         # The thought_signature error happens with some Gemini preview models
         # AFTER tools have already executed successfully.
         if "thought_signature" in error_str:
             try:
                 # Generate a natural confirmation
-                prompt = f"The user asked: '{user_input}'. The task has been completed successfully. Generate a brief, natural-sounding AI confirmation message."
+                prompt = f"The user asked: '{user_input}'."
+                if last_tool_output:
+                    prompt += f" The tool returned this data: {last_tool_output}. Include this information in your response."
+                else:
+                    prompt += " The task has been completed successfully."
+                
+                prompt += " Generate a brief, natural-sounding AI response for the user. Do not mention technology or internal tool names."
+                
                 fallback_resp = await llm.ainvoke(prompt)
                 return fallback_resp.content
             except:

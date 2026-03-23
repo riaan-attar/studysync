@@ -23,13 +23,17 @@ class ContestScannerTool(BaseTool):
     async def _fetch_leetcode(self) -> List[Dict[str, Any]]:
         api_url = "https://clist.by/api/v4/contest/"
         
-        # --- CHANGE: Load the API key from your .env file ---
+        # --- CHANGE: Load both username and API key ---
+        username = os.getenv("CLIST_USERNAME")
         api_key = os.getenv("CLIST_API_KEY")
-        if not api_key:
-            return [{"error": "CList API key not found in .env file."}]
         
-        headers = {"Authorization": api_key}
+        if not username or not api_key:
+            return [{"error": "CList credentials missing in .env file."}]
+        
+        # CList v4 uses username and api_key as query parameters
         params = {
+            "username": username,
+            "api_key": api_key,
             "resource": "leetcode.com",
             "start__gte": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
             "order_by": "start"
@@ -37,8 +41,7 @@ class ContestScannerTool(BaseTool):
         
         try:
             async with httpx.AsyncClient() as client:
-                # --- CHANGE: Pass the headers to the request ---
-                response = await client.get(api_url, headers=headers, params=params, timeout=15)
+                response = await client.get(api_url, params=params, timeout=15)
                 response.raise_for_status()
                 data = response.json()
             

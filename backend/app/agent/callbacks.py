@@ -10,6 +10,7 @@ class StreamingCallbackHandler(AsyncCallbackHandler):
     def __init__(self, queue: asyncio.Queue):
         super().__init__()
         self.queue = queue
+        self.last_tool_output = None # Store the output for fallback responses
 
     async def on_chat_model_start(
         self, serialized: Dict[str, Any], messages: List[List[BaseMessage]], **kwargs: Any
@@ -23,7 +24,8 @@ class StreamingCallbackHandler(AsyncCallbackHandler):
         await self.queue.put(f"event: tool_start\ndata: {json.dumps(data)}\n\n")
 
     async def on_tool_end(self, output: str, **kwargs: Any) -> Any:
-        """Send the tool's output to the frontend."""
+        """Send the tool's output to the frontend and store it for fallback."""
+        self.last_tool_output = output
         data = { "output": output }
         await self.queue.put(f"event: tool_end\ndata: {json.dumps(data)}\n\n")
 
