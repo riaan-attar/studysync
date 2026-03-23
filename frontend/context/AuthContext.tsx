@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react"
 import { useSession, signIn } from "next-auth/react"
+import { getApiUrl } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -50,8 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const storeToken = async () => {
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-          const response = await fetch(`${apiUrl}/api/users/store_refresh_token`, {
+          const response = await fetch(getApiUrl("/api/users/store_refresh_token"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

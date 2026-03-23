@@ -29,6 +29,7 @@ class AdvisorTool(BaseTool):
     name: str = "advisor_tool"
     description: str = "Generates a structured, step-by-step roadmap for a user's goal, such as learning a new skill or preparing for an event. Use this when the user asks for a 'plan', 'roadmap', or 'how to prepare'."
     args_schema: Type[AdvisorInput] = AdvisorInput
+    return_direct: bool = True
 
     def _create_error_response(self, goal: str, error_msg: str) -> str:
         """Create a valid JSON error response"""

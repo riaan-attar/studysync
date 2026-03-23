@@ -27,7 +27,6 @@ class StreamingCallbackHandler(AsyncCallbackHandler):
         data = { "output": output }
         await self.queue.put(f"event: tool_end\ndata: {json.dumps(data)}\n\n")
 
-    async def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> Any:
-        """Send the final answer to the frontend."""
-        data = { "output": finish.return_values["output"] }
-        await self.queue.put(f"event: final_chunk\ndata: {json.dumps(data)}\n\n")
+    # on_agent_finish is intentionally NOT handled here.
+    # The final response is emitted exclusively by chat.py using the
+    # return value of get_agent_response (which includes fallback logic).

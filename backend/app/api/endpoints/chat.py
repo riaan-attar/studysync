@@ -4,20 +4,15 @@ from app.agent.orchestrator import get_agent_response
 from fastapi.responses import StreamingResponse
 from app.agent.callbacks import StreamingCallbackHandler
 import asyncio
+import json
 
-# --- THIS IS THE FIX ---
-# We removed 'get_google_access_token' as it doesn't exist.
-# We only import get_current_user for endpoint security.
 from app.core.security import get_current_user, VerifiedUser
-# ---
 
 router = APIRouter()
 
 @router.post("/chat/stream")
 async def chat_stream(
-    # The request body now contains 'message' AND 'access_token'
     chat_request: ChatRequest,
-    # This dependency secures the endpoint using the token in the HEADER
     user: VerifiedUser = Depends(get_current_user) 
 ):
     queue = asyncio.Queue()
@@ -25,15 +20,22 @@ async def chat_stream(
 
     async def agent_task():
         try:
-            # Pass the token from the BODY to the agent
-            await get_agent_response(
+            result_output = await get_agent_response(
                 user_input=chat_request.message,
                 user_email=user.email,
-                access_token=chat_request.access_token, # <-- Use the token from the body
+                access_token=chat_request.access_token,
                 config={"callbacks": [callback]}
             )
+            
+            # This is the SOLE place that emits the final response.
+            # get_agent_response always returns a string (with fallback logic),
+            # and on_agent_finish in callbacks.py is intentionally disabled.
+            if result_output:
+                chunk = f"event: final_chunk\ndata: {json.dumps({'output': result_output})}\n\n"
+                await queue.put(chunk)
+                
         except Exception as e:
-            error_message = f"event: tool_end\ndata: {{\"output\": \"An error occurred: {e}\"}}\n\n"
+            error_message = f"event: final_chunk\ndata: {json.dumps({'output': f'An unexpected streaming error occurred: {e}'})}\n\n"
             await queue.put(error_message)
         finally:
             await queue.put("event: end\ndata: {}\n\n")

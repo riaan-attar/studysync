@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Loader2, Mail, MailCheck, ThumbsUp, ThumbsDown, AlertTriangle, Briefcase, Calendar, RefreshCw } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { getApiUrl } from "@/lib/utils"
 
 interface Update {
   id: number
@@ -164,7 +165,6 @@ export default function UpdatesView() {
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set())
   const [scanMessage, setScanMessage] = useState<string>("")
   const [error, setError] = useState<string>("")
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const fetchUpdates = async () => {
     if (!isFullyAuthenticated || !session?.accessToken) {
@@ -174,7 +174,7 @@ export default function UpdatesView() {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`${apiUrl}/api/updates`, {
+      const res = await fetch(getApiUrl("/api/updates"), {
         headers: { "Authorization": `Bearer ${session.accessToken}` }
       });
       if (!res.ok) {
@@ -192,7 +192,7 @@ export default function UpdatesView() {
 
   useEffect(() => {
     fetchUpdates();
-  }, [session, isFullyAuthenticated, apiUrl]);
+  }, [session, isFullyAuthenticated]);
 
   const handleScanNow = async () => {
     if (!isFullyAuthenticated || !session?.accessToken) {
@@ -205,7 +205,7 @@ export default function UpdatesView() {
     setError("");
 
     try {
-      const res = await fetch(`${apiUrl}/api/updates/scan_now`, {
+      const res = await fetch(getApiUrl("/api/updates/scan_now"), {
         method: "POST",
         headers: { "Authorization": `Bearer ${session.accessToken}` },
       });
@@ -240,7 +240,7 @@ export default function UpdatesView() {
     setProcessingIds(prev => new Set(prev).add(updateId));
 
     try {
-      const res = await fetch(`${apiUrl}/api/updates/feedback`, {
+      const res = await fetch(getApiUrl("/api/updates/feedback"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

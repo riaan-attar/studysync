@@ -7,6 +7,7 @@ import PopularRoadmaps from "./PopularRoadmaps";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Session } from "next-auth";
+import { getApiUrl } from "@/lib/utils";
 
 // --- Define Types ---
 export interface RoadmapStep {
@@ -238,8 +239,7 @@ export default function GenerateRoadmap({
     setRoadmap(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/chat/stream`, {
+      const response = await fetch(getApiUrl("/api/chat/stream"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

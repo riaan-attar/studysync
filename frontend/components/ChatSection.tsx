@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, type FormEvent } from "react"
 import { useAuth } from "../context/AuthContext"
 import { Send, Bot, User, Link as LinkIcon, Paperclip, Loader2, X, Check, Zap, Terminal, CheckCircle2 } from "lucide-react"
 import { createParser, type EventSourceMessage } from "eventsource-parser"
+import { getApiUrl } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -130,8 +131,7 @@ export default function ChatSection() {
         setAttachedLink(null);
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/chat/stream`, {
+      const response = await fetch(getApiUrl("/api/chat/stream"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

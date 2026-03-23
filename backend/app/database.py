@@ -12,6 +12,8 @@ SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 if not SQLALCHEMY_DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in your .env file")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+from sqlalchemy.pool import NullPool
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL, poolclass=NullPool)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

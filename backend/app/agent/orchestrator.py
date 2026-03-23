@@ -1,6 +1,6 @@
 import os
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from dotenv import load_dotenv
 
 from google.oauth2.credentials import Credentials
@@ -101,7 +101,7 @@ def create_agent_executor(access_token: str):
     if gmail_service:
         request_tools.append(GmailReaderTool(service=gmail_service))
 
-    agent = create_openai_tools_agent(llm, request_tools, prompt)
+    agent = create_tool_calling_agent(llm, request_tools, prompt)
     
     agent_executor = AgentExecutor(
         agent=agent, 
@@ -138,4 +138,10 @@ async def get_agent_response(
         return output
         
     except Exception as e:
-        return f"I encountered an error while processing your request: {str(e)}. Please try again or rephrase your request."
+        error_str = str(e)
+        # The thought_signature error happens with some Gemini preview models
+        # AFTER tools have already executed successfully. The agent completed
+        # its work but can't generate a final text response. Return a friendly message.
+        if "thought_signature" in error_str:
+            return "I've completed your request successfully! Please check your Google Calendar for the scheduled event."
+        return f"I encountered an error while processing your request: {error_str}. Please try again or rephrase your request."

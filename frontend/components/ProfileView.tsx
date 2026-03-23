@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, User, Phone, MapPin, AlignLeft, Calendar as CalendarIcon, Save, Image as ImageIcon } from "lucide-react"
 import Image from "next/image"
+import { getApiUrl } from "@/lib/utils"
 
 interface UserProfile {
   name: string
@@ -35,8 +36,7 @@ export default function ProfileView() {
 
   const fetchProfile = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${apiUrl}/api/users/me`, {
+      const res = await fetch(getApiUrl("/api/users/me"), {
         headers: {
           'Authorization': `Bearer ${session?.accessToken}`
         }
@@ -72,8 +72,7 @@ export default function ProfileView() {
     setMessage(null)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${apiUrl}/api/profile`, {
+      const res = await fetch(getApiUrl("/api/profile"), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

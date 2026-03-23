@@ -6,14 +6,14 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut } from 'lucide-react';
+import { getApiUrl } from '@/lib/utils';
 
 export default function AuthButtons() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.email) {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      fetch(`${apiUrl}/api/users/login`, {
+      fetch(getApiUrl("/api/users/login"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: session.user.email }),
