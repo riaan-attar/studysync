@@ -2,6 +2,7 @@ import os
 import json
 import time
 import requests
+import asyncio
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -9,6 +10,7 @@ from app import models
 from app.database import SessionLocal
 from app.agent.tools.gmail_json_tool import GmailJsonTool
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from app.services.whatsapp_service import whatsapp_service
 
 scheduler = AsyncIOScheduler()
 
@@ -176,6 +178,23 @@ def run_email_summary_for_user(user_email: str) -> list:
                 )
                 new_updates.append(upd)
                 print(f"[SCAN] ✓ SAVED {label} ({score:.2f}) {subject[:40]}")
+                
+                # --- Send WhatsApp Notification ---
+                if user.phone_number:
+                    try:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        loop.run_until_complete(
+                            whatsapp_service.send_update_notification(
+                                to_phone=user.phone_number,
+                                update_title=upd.title,
+                                update_summary=upd.summary
+                            )
+                        )
+                        loop.close()
+                    except Exception as wa_err:
+                        print(f"[SCAN WhatsApp Error] {wa_err}")
+                # ----------------------------------
             else:
                 if is_spam: spam_count += 1
                 else: filtered_count += 1
@@ -210,7 +229,7 @@ def run_email_summary_for_user(user_email: str) -> list:
 # ============================================================
 
 def scheduled_job_wrapper(user_email: str):
-    print(f"[SCHEDULER] Running daily scan for {user_email}")
+    print(f"[SCHEDULER] Running 10-minute scan for {user_email}")
     run_email_summary_for_user(user_email)
 
 
@@ -222,7 +241,7 @@ def start_scheduler_for_user(user_email: str):
 
     if not scheduler.get_job(job_id):
         scheduler.add_job(
-            scheduled_job_wrapper, "interval", days=1, args=[user_email], id=job_id
+            scheduled_job_wrapper, "interval", minutes=10, args=[user_email], id=job_id
         )
         print(f"[SCHEDULER] ✓ Added job for {user_email}")
 

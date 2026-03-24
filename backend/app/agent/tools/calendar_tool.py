@@ -24,6 +24,7 @@ class CreateCalendarEventTool(BaseTool):
     # --- NEW FIELD ---
     # The Google API service object, initialized and passed in by the agent orchestrator
     service: Any
+    user_email: str
 
     async def _arun(self, title: str, start_time: str, end_time: str, location: str, description: str):
         """Async version of the calendar event creation"""
@@ -56,6 +57,38 @@ class CreateCalendarEventTool(BaseTool):
             print(f"[DEBUG] Event object: {event}")
             
             created_event = self.service.events().insert(calendarId='primary', body=event).execute()
+            
+            # --- WHATSAPP NOTIFICATION ---
+            try:
+                from app.database import SessionLocal
+                from app.models import User
+                from app.services.whatsapp_service import whatsapp_service
+                
+                db = SessionLocal()
+                try:
+                    user_db = db.query(User).filter(User.email == self.user_email).first()
+                    if user_db and user_db.phone_number:
+                        event_link = created_event.get('htmlLink', '')
+                        # Format the start time for the message
+                        try:
+                            from datetime import datetime
+                            # Basic formatting if possible, otherwise use the string
+                            dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+                            formatted_time = dt.strftime("%B %d, %Y at %I:%M %p")
+                        except Exception:
+                            formatted_time = start_time
+
+                        await whatsapp_service.send_calendar_notification(
+                            to_phone=user_db.phone_number,
+                            event_title=title,
+                            event_time=formatted_time,
+                            event_link=event_link
+                        )
+                finally:
+                    db.close()
+            except Exception as e:
+                print(f"[WhatsApp] Failed to send calendar notification: {e}")
+            # -----------------------------
             
             success_message = f"✅ SUCCESS: Event '{title}' has been created in your Google Calendar for {start_time}! You can view it at: {created_event.get('htmlLink', 'your calendar')}"
             print(f"[DEBUG] {success_message}")

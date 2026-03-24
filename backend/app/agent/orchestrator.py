@@ -73,7 +73,7 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 
 # This function is now correct
-def create_agent_executor(access_token: str):
+def create_agent_executor(access_token: str, user_email: str):
     """
     Factory function to create an agent executor with token-aware tools.
     This function is called ONCE per request.
@@ -97,7 +97,7 @@ def create_agent_executor(access_token: str):
     
     # Add the stateful, auth-dependent tools
     if calendar_service:
-        request_tools.append(CreateCalendarEventTool(service=calendar_service))
+        request_tools.append(CreateCalendarEventTool(service=calendar_service, user_email=user_email))
     if gmail_service:
         request_tools.append(GmailReaderTool(service=gmail_service))
 
@@ -123,7 +123,7 @@ async def get_agent_response(
     config: dict = {}
 ):
     try:
-        agent_executor = create_agent_executor(access_token)
+        agent_executor = create_agent_executor(access_token, user_email)
     
         response = await agent_executor.ainvoke({
             "input": user_input,
