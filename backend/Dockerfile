@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 # 2. Set environment variables to prevent Python from writing .pyc files
 # and to flush logs to the terminal immediately
